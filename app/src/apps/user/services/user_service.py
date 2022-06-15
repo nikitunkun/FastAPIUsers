@@ -69,11 +69,14 @@ class UserService:
             return await json.loads(redis.client.get(user_id))
 
         result = await self.user_repository.find(primary_key=user_id)
-        await redis.client.setex(
-            name=user_id,
-            value=UserGetResponse.parse_obj(result).json(),
-            time=timedelta(minutes=1),
-        )
+
+        if result:
+            await redis.client.setex(
+                name=user_id,
+                value=UserGetResponse.parse_obj(result).json(),
+                time=timedelta(minutes=1),
+            )
+
         return result
 
     async def create_user(self, request_body: UserCreateRequest) -> UserCreateRequest:
@@ -100,7 +103,7 @@ class UserService:
             username=request_body.username,
             password=request_body.password,
         )
-        redis.client.delete(str(user_id))
+        await redis.client.delete(str(user_id))
         return {"id": user_id, **request_body.dict()}
 
     async def delete_user(self, user_id: UUID) -> Dict:
@@ -112,4 +115,5 @@ class UserService:
         """
 
         await self.user_repository.delete(primary_key=user_id)
+        await redis.client.delete(str(user_id))
         return {"id": user_id, "status": "deleted"}
