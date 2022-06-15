@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  api:
+    build:
+      dockerfile: ./Dockerfile
+      context: ./app
+    image: api
+    container_name: api
+    env_file: ./.env
+    depends_on:
+      - database
+      - redis
+    command: bash -c "alembic upgrade head && uvicorn --host 0.0.0.0 --port 80 --reload src.main:app"
+    ports:
+      - '8001:80'
+    volumes:
+      - ./app:/usr/app
+
+  database:
+    image: postgres:12
+    container_name: postgres
+    env_file: ./.env
+    ports:
+      - '5432:5432'
+  
+  redis:
+    image: redis
+    container_name: redis
+    ports:
+      - '6379:6379'
