@@ -19,7 +19,7 @@ def build_app() -> FastAPI:
     bootstrap(app)
     setup_exception_handlers(app)
     setup_routes(app)
-    
+
     Instrumentator().instrument(app).expose(app)
 
     return app
