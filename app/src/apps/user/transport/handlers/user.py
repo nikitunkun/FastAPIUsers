@@ -48,7 +48,7 @@ async def get_user(
         user = await user_service.verify(credentials=credentials)
 
     result = await user_service.get_user(user_id=user.id)
-    return UserGetResponse.parse_obj(result)
+    return result
 
 
 @router.post("/create", response_model=UserCreateResponse, summary="Создание пользователя")
