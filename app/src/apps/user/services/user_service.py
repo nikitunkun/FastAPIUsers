@@ -66,7 +66,7 @@ class UserService:
 
         user_id = str(user_id)
         if await redis.client.exists(user_id):
-            return await json.loads(redis.client.get(user_id))
+            return json.loads(await redis.client.get(user_id))
 
         result = await self.user_repository.find(primary_key=user_id)
 
